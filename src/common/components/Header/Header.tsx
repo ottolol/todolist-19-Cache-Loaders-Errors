@@ -5,6 +5,7 @@ import {
   selectThemeMode,
   setIsLoggedInAC,
 } from "@/app/app-slice.ts"
+import { baseApi } from "@/app/baseApi"
 import { clearDataAC } from "@/common/actions"
 import { NavButton } from "@/common/components/NavButton/NavButton"
 import { AUTH_TOKEN } from "@/common/constants"
@@ -41,7 +42,13 @@ export const Header = () => {
       if (res.data?.resultCode === ResultCode.Success) {
         dispatch(setIsLoggedInAC({ isLoggedIn: false }))
         localStorage.removeItem(AUTH_TOKEN)
-        dispatch(clearDataAC())
+        // dispatch(clearDataAC())
+
+        // Диспатч clearDataAC зачищал стейт в слайсах,
+        // а при работе с кэшем нужно зачищать именно кэш.
+        //
+        // Для сброса всего закэшированного state понадобится resetApiState:
+        dispatch(baseApi.util.resetApiState())
       }
     })
   }
