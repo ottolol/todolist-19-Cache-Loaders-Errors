@@ -1,5 +1,6 @@
 import { useAppDispatch } from "@/common/hooks"
 import { containerSx } from "@/common/styles"
+import { todolistsApi } from "@/features/todolists/api/todolistsApi"
 import {
   changeTodolistFilterAC,
   type DomainTodolist,
@@ -17,8 +18,26 @@ export const FilterButtons = ({ todolist }: Props) => {
 
   const dispatch = useAppDispatch()
 
+  // const changeFilter = (filter: FilterValues) => {
+  //   dispatch(changeTodolistFilterAC({ id, filter }))
+  // }
+
   const changeFilter = (filter: FilterValues) => {
-    dispatch(changeTodolistFilterAC({ id, filter }))
+    dispatch(
+      todolistsApi.util.updateQueryData(
+        // название эндпоинта, в котором нужно обновить кэш
+        "getTodolists",
+        // аргументы для эндпоинта
+        undefined,
+        // `updateRecipe` - коллбэк для обновления закэшированного стейта мутабельным образом
+        (state) => {
+          const todolist = state.find((todolist) => todolist.id === id)
+          if (todolist) {
+            todolist.filter = filter
+          }
+        },
+      ),
+    )
   }
 
   return (
