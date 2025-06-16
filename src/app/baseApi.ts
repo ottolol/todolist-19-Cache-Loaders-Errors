@@ -18,6 +18,23 @@ export const baseApi = createApi({
       if (result.error.status === 'FETCH_ERROR' || result.error.status === 'PARSING_ERROR') {
         api.dispatch(setAppErrorAC({ error: result.error.error }))
       }
+ 
+      if (result.error.status === 403) {
+        api.dispatch(setAppErrorAC({ error: '403 Forbidden Error. Check API-KEY' }))
+      }
+
+      if (result.error.status === 400 || result.error.status === 500) {
+        // ✅ 1. Type Assertions
+        // api.dispatch(setAppErrorAC({ error: (result.error.data as { message: string }).message }))
+        // ✅ 2. JSON.stringify
+        // api.dispatch(setAppErrorAC({ error: JSON.stringify(result.error.data) }))
+        // ✅ 3. Type Predicate
+        if (isErrorWithMessage(result.error.data)) {
+          api.dispatch(setAppErrorAC({ error: result.error.data.message }))
+        } else {
+          api.dispatch(setAppErrorAC({ error: JSON.stringify(result.error.data) }))
+        }
+      }
     }
     
     return result
