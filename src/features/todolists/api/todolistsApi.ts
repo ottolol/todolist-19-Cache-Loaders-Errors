@@ -1,8 +1,12 @@
 import { baseApi } from "@/app/baseApi"
-import { instance } from "@/common/instance"
-import type { BaseResponse } from "@/common/types"
-import type { DomainTodolist } from "@/features/todolists/model/todolists-slice"
-import type { Todolist } from "./todolistsApi.types"
+import { type DefaultResponse, defaultResponseSchema } from "@/common/types"
+import type { DomainTodolist } from "@/features/todolists/lib/types"
+import {
+  type CreateTodolistResponse,
+  createTodolistResponseSchema,
+  type Todolist,
+  todolistSchema,
+} from "./todolistsApi.types"
 
 export const todolistsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -10,6 +14,7 @@ export const todolistsApi = baseApi.injectEndpoints({
       query: () => "todo-lists",
       transformResponse: (todolists: Todolist[]): DomainTodolist[] =>
         todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" })),
+      extraOptions: { dataSchema: todolistSchema.array() },
       providesTags: ["Todolist"],
     }),
     addTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
@@ -18,6 +23,7 @@ export const todolistsApi = baseApi.injectEndpoints({
         method: "POST",
         body: { title },
       }),
+      extraOptions: { dataSchema: createTodolistResponseSchema },
       invalidatesTags: ["Todolist"],
     }),
     removeTodolist: build.mutation<BaseResponse, string>({
@@ -25,6 +31,7 @@ export const todolistsApi = baseApi.injectEndpoints({
         url: `todo-lists/${id}`,
         method: "DELETE",
       }),
+      extraOptions: { dataSchema: defaultResponseSchema },
       invalidatesTags: ["Todolist"],
     }),
     updateTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
@@ -33,6 +40,7 @@ export const todolistsApi = baseApi.injectEndpoints({
         method: "PUT",
         body: { title },
       }),
+      extraOptions: { dataSchema: defaultResponseSchema },
       invalidatesTags: ["Todolist"],
     }),
   }),
